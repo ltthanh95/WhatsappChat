@@ -60,4 +60,9 @@ public class UserServiceImpl implements UserService {
         List<User> users = this.userRepository.searchUser(query);
         return users;
     }
+
+    @Autowired
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
 }

@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-WhatappsApplication<whatapps>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.tl.whatapps.WhatappsApplication",
+            "projectName": "whatapps",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

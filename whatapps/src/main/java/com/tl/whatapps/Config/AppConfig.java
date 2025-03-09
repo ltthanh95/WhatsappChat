@@ -23,36 +23,33 @@ import org.springframework.web.cors.CorsConfigurationSource;
 public class AppConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/public/**").permitAll() // Explicitly allow `/`
-                        .requestMatchers("/api/**").authenticated() // Secure `/api/**`
+                        .requestMatchers("/", "/public/**").permitAll()
+                        .requestMatchers("/api/users/**").permitAll() // Allow public access for debugging
+                        .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class)
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(new CorsConfigurationSource() {
-                    @SuppressWarnings("null")
-                    @Override
-                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-                        CorsConfiguration cfg = new CorsConfiguration();
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration cfg = new CorsConfiguration();
 
-                        cfg.setAllowedOrigins(Arrays.asList("http://localhost:8080"));
-                        cfg.setAllowedOriginPatterns(Arrays.asList("http://localhost:8080"));
+                    // ✅ Allow only your frontend, do not use "*"
+                    cfg.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+                    cfg.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000"));
+                    cfg.setAllowCredentials(true);
+                    cfg.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    cfg.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+                    cfg.setExposedHeaders(Arrays.asList("Authorization"));
+                    cfg.setAllowCredentials(true); // Allow credentials, but origins must be explicit
+                    cfg.setMaxAge(3600L);
 
-                        cfg.setAllowedMethods(Collections.singletonList("*"));
-                        cfg.setAllowedHeaders(Collections.singletonList("*"));
-                        cfg.setExposedHeaders(Arrays.asList("Authorization"));
-                        cfg.setMaxAge(3600L);
-
-                        return cfg;
-                    }
-                })).formLogin(form -> form.disable()).httpBasic(httpBasic -> httpBasic.disable());
+                    return cfg;
+                }))
+                .formLogin(form -> form.disable())
+                .httpBasic(httpBasic -> httpBasic.disable());
 
         return http.build();
     }
-
-
-
 }

@@ -18,6 +18,12 @@ public class UserController {
     @Autowired
     private UserServiceImpl userService;
 
+    @GetMapping
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getAllUsers(); // Add this method in service
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
     @GetMapping("/profile")
     public ResponseEntity<User> getUserProfileHandler(@RequestHeader("Authorization") String token)
             throws UserException {

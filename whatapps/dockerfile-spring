@@ -1,0 +1,21 @@
+# Use an official OpenJDK with Maven
+FROM maven:3.8.7-eclipse-temurin-17 AS build
+
+# Set the working directory
+WORKDIR /app
+
+# Copy pom.xml and download dependencies
+COPY pom.xml .
+RUN mvn dependency:go-offline
+
+# Copy the rest of the project
+COPY . .
+
+# Build the application (Optional)
+RUN mvn clean package -DskipTests
+
+# Run the application
+CMD ["mvn", "spring-boot:run"]
+
+# Expose application port
+EXPOSE 8080
